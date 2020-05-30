@@ -1,29 +1,29 @@
 from textblob import TextBlob
 import tweepy
-import spacy
+import nltk
 
-# python3 -m spacy download pt_core_news_sm
-nlp = spacy.load("pt_core_news_sm")
+import spacy
+from spacymoji import Emoji
+
+from collections import Counter
+
+word_list = []
 
 class MySpacySentimentCounter(tweepy.StreamListener):
   def on_status(self, status):
-    print(status.text)
+    blacklist = ['netflix', 'rt', 'https', 't', 'co', 'q', 'a', 'o', 'e', 'n', 'pq', 'vc']
 
-    polarity = TextBlob(status.text).translate(to='en').sentiment.polarity
+    nlp = spacy.load("pt_core_news_sm")
+    emoji = Emoji(nlp)
+    nlp.add_pipe(emoji)
 
-    print("A polaridade é " + str(polarity))
-    if (polarity > 0):
-      global positive
-      positive = positive + 1
-    elif polarity < 0:
-      global negative
-      negative = negative + 1
-    else:
-      global neutral
-      neutral = neutral + 1
+    tokens = nlp(status.text.lower())
 
-    print("sentimentos:")
-    print("positive: ", str(positive))
-    print("negative: ", str(negative))
-    print("neutral: ", str(neutral))
-    print("\n\n\n")
+    words = [token.text for token in tokens if token.is_stop != True and token.is_punct != True 
+             and token._.is_emoji != True and token.text not in blacklist]
+    word_list.extend(words)
+
+    fdist = nltk.FreqDist(word_list)
+    print('10 MAIS FREQUENTES:')
+    print(fdist.most_common(10))
+    print('\n')
