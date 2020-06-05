@@ -3,7 +3,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 import json
 import tweepy
-import constants
+from tools.constants import SERIES
 
 tokenizer = RegexpTokenizer(r'\w+')
 nltk.download('stopwords')
@@ -17,7 +17,7 @@ class MyStreamSeriesRanking(tweepy.StreamListener):
     print(status.text)
     print('\n----\n')
 
-    for serie in constants.SERIES:
+    for serie in SERIES:
       if serie.lower() in status.text.lower():
         results[serie] = results.get(serie, 0) + 1
 
