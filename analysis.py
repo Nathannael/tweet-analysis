@@ -22,3 +22,4 @@ myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
 print("iniciando")
 myStream.filter(track=constants.SERIES, languages=['pt'], is_async=True)
 
+PlotGraphs.commence_the_plotting()
