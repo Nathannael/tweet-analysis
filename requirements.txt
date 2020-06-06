@@ -1,0 +1,8 @@
+python-dotenv
+textblob
+nltk
+tweepy
+spacy
+plotly == 4.8.1
+dash == 1.12.0
+spacymoji
