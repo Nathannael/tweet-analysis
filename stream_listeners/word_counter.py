@@ -1,38 +1,48 @@
 import tweepy
 import nltk
+import spacy
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
+from lib.tools import save_to_file
 
 tokenizer = RegexpTokenizer(r'\w+')
 nltk.download('stopwords')
+nlp = spacy.load("en_core_web_md")
 
 words = []
+result = {}
 
 class MyStreamWordCounter(tweepy.StreamListener):
   def on_status(self, status):
-    blacklist = stopwords.words('portuguese')
-    blacklist.extend(['netflix', 'rt', 'https', 't', 'co', 'q'])
+    # result = self.tokenize_using_spacy(status.text, 'VERB')
+    result = self.tokenize_using_spacy(status.text, 'NOUN')
+    save_to_file(result)
 
-    tweet_text = status.text.lower()
+  def tokenize_by_stopwords(self, tweet):
+    banlist = stopwords.words('english')
+    banlist.extend(['rt', 'https', 't', 'co', 'q'])
 
-    print("Tweet:")
-    print(status.text)
-    print("\n")
+    tweet_text = tweet.lower()
 
-    print("Tokens:")
-    tokens = [ word for word in tokenizer.tokenize(tweet_text) if not word in blacklist ]
-    print(tokens)
-    print("\n")
+    tokens = [ word for word in tokenizer.tokenize(tweet_text) if not word in banlist ]
 
     words.extend(tokens)
 
-    # print("Blobs:")
-    # blob = TextBlob(status.text)
-    # print(blob.tags)
-    # print(blob.noun_phrases)
-    # print("\n")
-
-    print("MAIS COMUNS:")
     fdist = nltk.FreqDist(words)
-    print(fdist.most_common(10))
-    print("\n\n\n")
+    return dict(fdist.most_common(10))
+
+  def tokenize_using_spacy(self, tweet, pos):
+    doc = nlp(tweet)
+
+    for token in doc:
+        if token.is_stop:
+            continue
+        if token.pos_ == pos:
+            if token.lemma_ in result:
+                result[token.lemma_] += 1
+            else:
+                result[token.lemma_] = 1
+
+    print(doc)
+
+    return result

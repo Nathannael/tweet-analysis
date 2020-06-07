@@ -35,7 +35,7 @@ class PlotGraphs:
       data = json.load(open("data.json"))
       data = {k: v for k, v in sorted(data.items(), key=lambda item: item[1], reverse=True)}
 
-      data =  {'x': list(data.keys()), 'y': list(data.values()), 'type': 'bar', 'name': 'SF'}
+      data =  {'x': list(data.keys())[:15], 'y': list(data.values())[:15], 'type': 'bar', 'name': 'SF'}
 
       return {'data': [data] }
 
