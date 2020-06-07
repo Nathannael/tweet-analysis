@@ -9,7 +9,7 @@ import tweepy
 # from stream_listeners.word_counter import MySpacySentimentCounter
 from stream_listeners.series_ranking import MyStreamSeriesRanking
 from dashboards.plot_graphs import PlotGraphs
-from tools.constants import SERIES
+from lib.tools import SERIES
 
 
 auth = tweepy.OAuthHandler(os.getenv('consumer_key'), os.getenv('consumer_secret'))

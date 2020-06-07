@@ -1,9 +1,9 @@
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
-import json
 import tweepy
-from tools.constants import SERIES
+from lib.tools import SERIES
+from lib.tools import save_to_file
 
 tokenizer = RegexpTokenizer(r'\w+')
 nltk.download('stopwords')
@@ -21,7 +21,4 @@ class MyStreamSeriesRanking(tweepy.StreamListener):
       if serie.lower() in status.text.lower():
         results[serie] = results.get(serie, 0) + 1
 
-    json_file = json.dumps(results)
-    f = open("data.json","w")
-    f.write(json_file)
-    f.close()
+    save_to_file(results)
