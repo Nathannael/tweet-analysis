@@ -25,10 +25,15 @@ class Analysis:
     myStreamListener = MyStreamWordCounter()
 
     myStream = tweepy.Stream(auth=api.auth, listener=myStreamListener)
-    myStream.words = []
-    myStream.result = {}
+    save_to_file({})
+
     print('Iniciando')
     print(keyword)
-    save_to_file({})
+
     myStream.filter(track=[keyword], languages=['en'], is_async=True)
     return myStream
+
+  @classmethod
+  def stop(self, streamer):
+    MyStreamWordCounter.empty_vars()
+    streamer.disconnect()

@@ -41,9 +41,10 @@ def update_output_div(n_clicks, input_value):
   global streamer
 
   if streamer is not None:
-    streamer.disconnect()
+    Analysis.stop(streamer)
+
   streamer = Analysis.perform(input_value)
-  return 'Iniciando'
+  return 'Iniciado'
 
 @app.callback(
   Output('live-graph', 'figure'),

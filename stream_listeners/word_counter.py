@@ -14,7 +14,6 @@ result = {}
 
 class MyStreamWordCounter(tweepy.StreamListener):
   def on_status(self, status):
-    # result = self.tokenize_using_spacy(status.text, 'VERB')
     result = self.tokenize_using_spacy(status.text, 'NOUN')
     save_to_file(result)
 
@@ -46,3 +45,11 @@ class MyStreamWordCounter(tweepy.StreamListener):
     print(doc)
 
     return result
+
+  @classmethod
+  def empty_vars(self):
+    global words
+    global result
+
+    words = []
+    result = {}
