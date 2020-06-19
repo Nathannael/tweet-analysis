@@ -9,7 +9,6 @@ import time
 # from stream_listeners.spacy_sentiment_counter import MySpacySentimentCounter
 # from stream_listeners.word_counter import MySpacySentimentCounter
 from stream_listeners.word_counter import MyStreamWordCounter
-from stream_listeners.series_ranking import MyStreamSeriesRanking
 
 from lib.tools import save_to_file
 
