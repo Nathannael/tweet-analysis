@@ -17,8 +17,15 @@ pip install -r requirements.txt
 ```
 
 ```bash
-- python -m spacy download pt_core_news_sm
+python -m spacy download pt_core_news_sm
 ```
 
 -----
 
+O Projeto necessita de acesso à API do twitter. Para isso, crie uma conta de desenvolvedor na plataforma ([Link](https://developer.twitter.com/en/apply-for-access)), e crie uma aplicação. Depois disso, crie um arquivo `.env` com as credenciais fornecidas pelo twitter. As chaves necessárias nesse arquivo são as mesmas fornecidas no ato da criação da aplicação, ou seja, `access_token`, `access_token_secret`, `consumer_key`, `consumer_secret`.
+
+------
+
+# Relatório
+
+O relatório associado a este projeto pode ser encontrado na Wiki deste repositório. ([Link](https://github.com/Nathannael/tweet-analysis/wiki))
