@@ -5,9 +5,6 @@ import os
 import tweepy
 import time
 
-# from stream_listeners.sentiment_counter import MyStreamSentimentCounter
-# from stream_listeners.spacy_sentiment_counter import MySpacySentimentCounter
-# from stream_listeners.word_counter import MySpacySentimentCounter
 from stream_listeners.word_counter import MyStreamWordCounter
 
 from lib.tools import save_to_file

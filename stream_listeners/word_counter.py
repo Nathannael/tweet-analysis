@@ -11,18 +11,24 @@ nlp = spacy.load("en_core_web_md")
 
 words = []
 result = {}
-count = 0
+tweets_total = 0
+most_retweeted = {}
 
 class MyStreamWordCounter(tweepy.StreamListener):
   def on_status(self, status):
-    global count
+    global tweets_total
 
-    count += 1
-    save_to_file({ 'count': count }, filename="number_tweets.json")
+    text = self.extract_text(status)
+    self.track_retweets(status)
 
-    tweet_without_symbols = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",status.text).split())
+    tweets_total += 1
+    save_to_file({ 'count': tweets_total }, filename="number_tweets.json")
+
+    tweet_without_symbols = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ", text).split())
 
     result = self.tokenize_using_spacy(tweet_without_symbols, 'NOUN')
+    print("--------RESULT--------------")
+    print(result)
     save_to_file(result)
 
   def tokenize_using_spacy(self, tweet, pos):
@@ -41,12 +47,37 @@ class MyStreamWordCounter(tweepy.StreamListener):
 
     return result
 
+  def extract_text(self, tweet):
+    if hasattr(tweet, "retweeted_status"):  # Check if Retweet
+      try:
+        return tweet.retweeted_status.extended_tweet["full_text"]
+      except AttributeError:
+        return tweet.retweeted_status.text
+    else:
+      try:
+        return tweet.extended_tweet["full_text"]
+      except AttributeError:
+        return tweet.text
+
+  def track_retweets(self, tweet):
+    global most_retweeted
+
+    if hasattr(tweet, "retweeted_status"):  # Check if Retweet
+      id_rt = tweet.retweeted_status.id_str
+      if id_rt in most_retweeted:
+        most_retweeted[id_rt] += 1
+      else:
+        most_retweeted[id_rt] = 1
+
+      most_retweeted[tweet.retweeted_status.id_str]
+      save_to_file(most_retweeted, filename="most_retweeted.json")
+
   @classmethod
   def empty_vars(self):
     global words
     global result
-    global count
+    global tweets_total
 
     words = []
     result = {}
-    count = 0
+    tweets_total = 0
