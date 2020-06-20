@@ -68,9 +68,11 @@ class MyStreamWordCounter(tweepy.StreamListener):
     if hasattr(tweet, "retweeted_status"):  # Check if Retweet
       id_rt = tweet.retweeted_status.id_str
       if id_rt in most_retweeted:
-        most_retweeted[id_rt] += 1
+        most_retweeted[id_rt]["count"] += 1
       else:
-        most_retweeted[id_rt] = 1
+        most_retweeted[id_rt] = {}
+        most_retweeted[id_rt]["count"] = 1
+        most_retweeted[id_rt]["link"] = "https://twitter.com/i/web/status/"+ id_rt
 
       save_to_file(most_retweeted, filename="most_retweeted.json")
 
@@ -89,9 +91,6 @@ class MyStreamWordCounter(tweepy.StreamListener):
     global countries
 
     location = tweet.user.location
-    print("------place-------")
-    print(location)
-    print("------place-------")
     if location is not None:
       if location in countries:
         countries[location] += 1

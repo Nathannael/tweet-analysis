@@ -29,7 +29,7 @@ app.layout = html.Div(
 
       html.Div([
           dcc.Input(id='input-on-submit', type='text'),
-          html.Button('Submit', id='submit-val', n_clicks=0),
+          html.Button('INICIAR', id='submit-val', n_clicks=0),
       ]),
       html.Div(id='container-button-basic', children='Enter a value and press submit'),
       html.H3(id='number_tweets', children=''),
@@ -56,6 +56,10 @@ app.layout = html.Div(
       html.P(children='Análise das localizações que os usuários colocam em seus perfis'),
       dcc.Graph(id='live-graph-countries', animate=False),
 
+      html.Hr(),
+      html.H4(children='Análise de Retweets'),
+      html.P(children='Conteúdo mais Retweetado desde o início da pesquisa'),
+      html.Div(id='most-rts')
 
     ]
 )
@@ -122,6 +126,34 @@ def update_graph_sources(n):
   data =  {'x': list(data.keys())[:15], 'y': list(data.values())[:15], 'type': 'bar', 'name': 'SF'}
 
   return { 'data': [data] }
+
+# Callback da lista de maiores RTs
+@app.callback(
+  Output('most-rts', 'children'),
+  [Input('graph-update', 'n_intervals')]
+  )
+def update_rts(n):
+  data = load_from_file('most_retweeted.json')
+  data = {k: v for k, v in sorted(data.items(), key=lambda item: item[1]['count'], reverse=True)}
+
+  top_rts = list(data.values())[:5]
+
+  return list(map(map_rts, top_rts))
+
+def map_rts(tweet):
+  return html.Div(
+    children=[
+      html.P(children=[
+        html.B(children='Tweet: '),
+        html.A(href=tweet['link'], children=tweet['link'])
+      ]),
+      html.P(children=[
+        html.B(children='Qtd: '),
+        html.P(children=[ tweet['count'] ])
+        ])
+    ],
+    style={ 'border': 'solid', 'padding': '5px', 'margin': '5px' }
+  )
 
 ############################3
 # RUN SERVER
