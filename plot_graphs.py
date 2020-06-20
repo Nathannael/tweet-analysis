@@ -22,6 +22,8 @@ app.layout = html.Div(
       html.Button('Submit', id='submit-val', n_clicks=0),
       html.Div(id='container-button-basic',
               children='Enter a value and press submit'),
+      html.H3(id='number_tweets',
+              children='Enter a value and press submit'),
 
       dcc.Graph(id='live-graph', animate=True),
       dcc.Interval(
@@ -57,6 +59,16 @@ def update_graph_tweets(n):
   data =  {'x': list(data.keys())[:15], 'y': list(data.values())[:15], 'type': 'bar', 'name': 'SF'}
 
   return {'data': [data] }
+
+
+@app.callback(
+  Output('number_tweets', 'children'),
+  [Input('graph-update', 'n_intervals')]
+)
+def show_num_tweets(n):
+  data = json.load(open("number_tweets.json"))
+  return f'{data["count"]} tweets analisados'
+
 
 if __name__ == '__main__':
   app.run_server(debug=True)

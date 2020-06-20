@@ -11,9 +11,15 @@ nlp = spacy.load("en_core_web_md")
 
 words = []
 result = {}
+count = 0
 
 class MyStreamWordCounter(tweepy.StreamListener):
   def on_status(self, status):
+    global count
+
+    count += 1
+    save_to_file({ 'count': count }, filename="number_tweets.json")
+
     tweet_without_symbols = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ",status.text).split())
 
     result = self.tokenize_using_spacy(tweet_without_symbols, 'NOUN')
@@ -39,6 +45,8 @@ class MyStreamWordCounter(tweepy.StreamListener):
   def empty_vars(self):
     global words
     global result
+    global count
 
     words = []
     result = {}
+    count = 0
