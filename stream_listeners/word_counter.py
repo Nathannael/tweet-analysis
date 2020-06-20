@@ -14,6 +14,7 @@ result = {}
 tweets_total = 0
 most_retweeted = {}
 sources = {}
+countries = {}
 
 class MyStreamWordCounter(tweepy.StreamListener):
   def on_status(self, status):
@@ -22,6 +23,7 @@ class MyStreamWordCounter(tweepy.StreamListener):
     text = self.extract_text(status)
     self.track_retweets(status)
     self.track_sources(status)
+    self.track_countries(status)
 
     tweets_total += 1
     save_to_file({ 'count': tweets_total }, filename="number_tweets.json")
@@ -83,16 +85,33 @@ class MyStreamWordCounter(tweepy.StreamListener):
 
     save_to_file(sources, filename="sources.json")
 
+  def track_countries(self, tweet):
+    global countries
+
+    location = tweet.user.location
+    print("------place-------")
+    print(location)
+    print("------place-------")
+    if location is not None:
+      if location in countries:
+        countries[location] += 1
+      else:
+        countries[location] = 1
+
+    save_to_file(countries, filename="countries.json")
+
   @classmethod
   def empty_vars(self):
     global words
     global result
-    global tweets_total
     global sources
+    global countries
+    global tweets_total
     global most_retweeted
 
     words = []
     result = {}
     sources = {}
-    most_retweeted = {}
+    countries = {}
     tweets_total = 0
+    most_retweeted = {}

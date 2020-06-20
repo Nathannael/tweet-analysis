@@ -15,9 +15,11 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 streamer = None
 
+# Init files
 save_to_file({ 'count': 0 }, filename="number_tweets.json")
 save_to_file({}, filename="most_retweeted.json")
 save_to_file({}, filename="sources.json")
+save_to_file({}, filename="countries.json")
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -32,17 +34,29 @@ app.layout = html.Div(
       html.Div(id='container-button-basic', children='Enter a value and press submit'),
       html.H3(id='number_tweets', children=''),
 
+      html.Hr(),
+
       html.H4(children='Análise de frequência de substantivos'),
-      dcc.Graph(id='live-graph', animate=True),
+      dcc.Graph(id='live-graph', animate=False),
+
+      html.Hr(),
 
       html.H4(children='Análise de frequência de fontes'),
-      dcc.Graph(id='live-graph-sources', animate=True),
+      dcc.Graph(id='live-graph-sources', animate=False),
 
       dcc.Interval(
         id='graph-update',
         interval=1*1000, # in milliseconds
         n_intervals=0
       ),
+
+      html.Hr(),
+
+      html.H4(children='Análise de Localização dos usuários'),
+      html.P(children='Análise das localizações que os usuários colocam em seus perfis'),
+      dcc.Graph(id='live-graph-countries', animate=False),
+
+
     ]
 )
 
@@ -77,6 +91,19 @@ def show_num_tweets(n):
 )
 def update_graph_tweets(n):
   data = load_from_file()
+  data = {k: v for k, v in sorted(data.items(), key=lambda item: item[1], reverse=True)}
+
+  data =  {'x': list(data.keys())[:15], 'y': list(data.values())[:15], 'type': 'bar', 'name': 'SF'}
+
+  return { 'data': [data] }
+
+# Callback do gráfico de frequência de países
+@app.callback(
+  Output('live-graph-countries', 'figure'),
+  [Input('graph-update', 'n_intervals')]
+  )
+def update_graph_countries(n):
+  data = load_from_file('countries.json')
   data = {k: v for k, v in sorted(data.items(), key=lambda item: item[1], reverse=True)}
 
   data =  {'x': list(data.keys())[:15], 'y': list(data.values())[:15], 'type': 'bar', 'name': 'SF'}
