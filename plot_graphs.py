@@ -16,6 +16,8 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 streamer = None
 
 save_to_file({ 'count': 0 }, filename="number_tweets.json")
+save_to_file({}, filename="most_retweeted.json")
+save_to_file({}, filename="sources.json")
 
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -23,14 +25,19 @@ app.layout = html.Div(
     [
       html.H1(children='Tweet-Analysis'),
 
-      html.Div(dcc.Input(id='input-on-submit', type='text')),
-      html.Button('Submit', id='submit-val', n_clicks=0),
-      html.Div(id='container-button-basic',
-              children='Enter a value and press submit'),
-      html.H3(id='number_tweets',
-              children='Enter a value and press submit'),
+      html.Div([
+          dcc.Input(id='input-on-submit', type='text'),
+          html.Button('Submit', id='submit-val', n_clicks=0),
+      ]),
+      html.Div(id='container-button-basic', children='Enter a value and press submit'),
+      html.H3(id='number_tweets', children=''),
 
+      html.H4(children='Análise de frequência de substantivos'),
       dcc.Graph(id='live-graph', animate=True),
+
+      html.H4(children='Análise de frequência de fontes'),
+      dcc.Graph(id='live-graph-sources', animate=True),
+
       dcc.Interval(
         id='graph-update',
         interval=1*1000, # in milliseconds
@@ -39,6 +46,7 @@ app.layout = html.Div(
     ]
 )
 
+# Callback do botão de enviar keyword
 @app.callback(
   dash.dependencies.Output('container-button-basic', 'children'),
   [dash.dependencies.Input('submit-val', 'n_clicks')],
@@ -53,6 +61,16 @@ def update_output_div(n_clicks, input_value):
   streamer = Analysis.perform(input_value)
   return 'Iniciado'
 
+# Callback da label que mostra a qtd de tweets analisados
+@app.callback(
+  Output('number_tweets', 'children'),
+  [Input('graph-update', 'n_intervals')]
+)
+def show_num_tweets(n):
+  data = load_from_file(filename="number_tweets.json")
+  return f'{data["count"]} tweets analisados'
+
+# Callback do gráfico de frequência de termos (substantivos)
 @app.callback(
   Output('live-graph', 'figure'),
   [Input('graph-update', 'n_intervals')]
@@ -65,16 +83,21 @@ def update_graph_tweets(n):
 
   return { 'data': [data] }
 
-
+# Callback do gráfico de frequência de fontes
 @app.callback(
-  Output('number_tweets', 'children'),
+  Output('live-graph-sources', 'figure'),
   [Input('graph-update', 'n_intervals')]
-)
-def show_num_tweets(n):
-  data = load_from_file(filename="number_tweets.json")
-  return f'{data["count"]} tweets analisados'
+  )
+def update_graph_sources(n):
+  data = load_from_file('sources.json')
+  data = {k: v for k, v in sorted(data.items(), key=lambda item: item[1], reverse=True)}
 
+  data =  {'x': list(data.keys())[:15], 'y': list(data.values())[:15], 'type': 'bar', 'name': 'SF'}
 
+  return { 'data': [data] }
+
+############################3
+# RUN SERVER
 if __name__ == '__main__':
   app.run_server(debug=True)
 

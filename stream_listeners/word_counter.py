@@ -13,6 +13,7 @@ words = []
 result = {}
 tweets_total = 0
 most_retweeted = {}
+sources = {}
 
 class MyStreamWordCounter(tweepy.StreamListener):
   def on_status(self, status):
@@ -20,6 +21,7 @@ class MyStreamWordCounter(tweepy.StreamListener):
 
     text = self.extract_text(status)
     self.track_retweets(status)
+    self.track_sources(status)
 
     tweets_total += 1
     save_to_file({ 'count': tweets_total }, filename="number_tweets.json")
@@ -27,8 +29,6 @@ class MyStreamWordCounter(tweepy.StreamListener):
     tweet_without_symbols = ' '.join(re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)"," ", text).split())
 
     result = self.tokenize_using_spacy(tweet_without_symbols, 'NOUN')
-    print("--------RESULT--------------")
-    print(result)
     save_to_file(result)
 
   def tokenize_using_spacy(self, tweet, pos):
@@ -44,6 +44,7 @@ class MyStreamWordCounter(tweepy.StreamListener):
                 result[token.lemma_] = 1
 
     print(doc)
+    print("-------\n")
 
     return result
 
@@ -69,15 +70,29 @@ class MyStreamWordCounter(tweepy.StreamListener):
       else:
         most_retweeted[id_rt] = 1
 
-      most_retweeted[tweet.retweeted_status.id_str]
       save_to_file(most_retweeted, filename="most_retweeted.json")
+
+  def track_sources(self, tweet):
+    global sources
+
+    source = tweet.source
+    if source in sources:
+      sources[source] += 1
+    else:
+      sources[source] = 1
+
+    save_to_file(sources, filename="sources.json")
 
   @classmethod
   def empty_vars(self):
     global words
     global result
     global tweets_total
+    global sources
+    global most_retweeted
 
     words = []
     result = {}
+    sources = {}
+    most_retweeted = {}
     tweets_total = 0
